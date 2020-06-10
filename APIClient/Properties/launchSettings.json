@@ -1,0 +1,10 @@
+{
+    "profiles": {
+        "": {
+            "commandName": "Project",
+            "environmentVariables": {
+            "KEYVAULT_ENDPOINT": "https://lssd-marktest.vault.azure.net/"
+            }
+        }
+        }
+}

@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Identity.Client;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Linq;
 
 namespace APIClient
 {
@@ -63,6 +66,35 @@ namespace APIClient
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(ex.Message);
                 Console.ResetColor();                
+            }
+
+            if (!string.IsNullOrEmpty(result.AccessToken)) {
+                var httpClient = new HttpClient();
+                var defaultRequestHeaders = httpClient.DefaultRequestHeaders;
+
+                if ((defaultRequestHeaders.Accept == null) || !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json")) {
+                    httpClient.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json")
+                    );
+                }
+
+                defaultRequestHeaders.Authorization = 
+                    new AuthenticationHeaderValue("bearer", result.AccessToken);
+
+                HttpResponseMessage response = await httpClient.GetAsync("https://localhost:5001/WeatherForecast");
+
+                if (response.IsSuccessStatusCode) {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Success");
+                } else {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Fail");
+
+                }
+
+                string content = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(content);
+                Console.ResetColor();
             }
         }
     }

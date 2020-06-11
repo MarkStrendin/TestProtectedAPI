@@ -1,7 +1,33 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@using System.Linq;
+@using Microsoft.AspNetCore.Http;
+@using BlazorClient.Data;
 
-Welcome to your new app.
+@code {
+    [Inject]
+    AuthenticationStateProvider context { get; set; }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    [Inject]
+    WeatherAPIService weatherAPI { get; set; }
+
+    string username = "Herp Derpson";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("Derp");
+        //username = (await context.GetAuthenticationStateAsync()).User.Identity.Name;
+
+        List<WeatherForecast> weather = (await weatherAPI.GetAll()).ToList();
+
+        foreach (WeatherForecast w in weather)
+        {
+            Console.WriteLine(w.Summary);
+        }
+
+        Console.WriteLine((await context.GetAuthenticationStateAsync()).User.Identity.AuthenticationType);
+
+    }
+}
+
+<h1>Thing</h1>
